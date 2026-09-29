@@ -73,14 +73,15 @@ ai-studybuddy/
 
 ### Auth Routes — `/api/auth`
 
-| Method | Endpoint    | Body                              | Description          |
-|--------|-------------|-----------------------------------|----------------------|
-| POST   | /register   | `name, email, password, role`     | Register new user    |
-| POST   | /login      | `email, password`                 | Login                |
-| POST   | /refresh    | —                                 | Refresh tokens       |
-| POST   | /logout     | —                                 | Clear cookies        |
+| Method | Endpoint    | Body                          | Description          |
+|--------|-------------|-------------------------------|----------------------|
+| POST   | /register   | `name, email, password`       | Register a student   |
+| POST   | /login      | `email, password`             | Login                |
+| POST   | /refresh    | —                             | Refresh tokens       |
+| POST   | /logout     | —                             | Sign out             |
 
-> Tokens are stored in **HTTP-only cookies** (`accessToken` expires in 15m, `refreshToken` in 7d)
+> Public registration always creates a `student` account. Admin accounts must be created directly in the database or through a restricted server-side process.
+> Auth uses the `Authorization: Bearer <token>` header. Tokens are returned in the JSON response and are not stored in cookies.
 
 ---
 
@@ -109,11 +110,11 @@ ai-studybuddy/
 
 ---
 
-## Cookie Details
+## Token Details
 
-| Cookie         | Expiry   | Flags                        |
+| Token          | Expiry   | Transport                    |
 |----------------|----------|------------------------------|
-| `accessToken`  | 15 min   | httpOnly, sameSite=strict    |
-| `refreshToken` | 7 days   | httpOnly, sameSite=strict    |
+| `accessToken`  | 15 min   | `Authorization: Bearer ...` |
+| `refreshToken` | 7 days   | `x-refresh-token` header     |
 
-In production, both cookies have `secure: true`.
+The API returns both tokens in JSON, and the client must attach the access token to protected requests using the Bearer scheme.
